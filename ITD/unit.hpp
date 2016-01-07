@@ -1,0 +1,27 @@
+#ifndef H_UNIT
+#define H_UNIT
+
+#include "basics.hpp"
+#include "tile.hpp"
+
+class unit_t
+{
+  public :
+    tile_t * tile_;
+
+    int HP_;
+    int maxAP_;
+    int AP_;
+
+    int weapon_; // 0 - sword, 1 - shotgun, 2 - rifle, 3 - sniper rifle
+
+    int posX_;
+    int posY_;
+    bool alive_;
+
+    unit_t ( int posX, int posY );
+    void kill ( );
+    ~unit_t ();
+};
+
+#endif
