@@ -119,6 +119,8 @@ int main ( int argc, char* args[] )
     int x = 0,
         y = 0;
 
+    Uint32 gID = SDL_GetWindowID ( gWindow );
+
    while ( !quit )
     {
       while ( SDL_PollEvent ( &event1 ) != 0 )
@@ -131,16 +133,18 @@ int main ( int argc, char* args[] )
         {
           if ( ( event1.type == SDL_MOUSEBUTTONUP ) && ( event2.type == SDL_MOUSEBUTTONDOWN ) )
           {
-            SDL_GetMouseState ( &x, &y );
-            if ( ( x > 0 ) && ( y > 0 ) && ( x < SCREEN_WIDTH ) && ( y < SCREEN_HEIGHT ) )
+            x = event1.button.x;
+            y = event1.button.y;
+            if ( event1.button.windowID == gID )
               Game->handlePress ( x, y );
           }
           else
           {
             if ( event1.type == SDL_MOUSEMOTION )
             {
-              SDL_GetMouseState ( &x, &y );
-              if ( ( x > 0 ) && ( y > 0 ) && ( x < SCREEN_WIDTH ) && ( y < SCREEN_HEIGHT ) )
+              x = event1.motion.x;
+              y = event1.motion.y;
+              if ( event1.motion.windowID == gID )
                 Game->handleMotion ( x, y );
             }
           }

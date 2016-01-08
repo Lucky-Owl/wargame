@@ -59,6 +59,12 @@ bool game_instance_t::loadImages ( SDL_Renderer * gRenderer )
     printf("Failed loading tile texture!\n");
     success = false;
   }
+  fog_ = new tile_t ( loadTexture ( gRenderer, "images/fog.bmp" ) );
+  if ( fog_ == NULL ) 
+  {
+    printf("Failed loading fog texture!\n");
+    success = false;
+  }
   return success;
 }
 
@@ -66,61 +72,87 @@ bool game_instance_t::loadUnits ( SDL_Renderer * gRenderer )
 {
   for ( int i = 0; i < 6; i++ )
   {
-    teamA[i] = new unit_t ( i+6, i+6 );
+    teamA[i] = new unit_t ( i, i );
     teamA[i]->tile_ = new tile_t ( loadTexture ( gRenderer, "images/unitA.bmp" ) );
     if ( teamA[i]->tile_ == NULL )
     {
-      printf ( "Unable to load units.\n" );
+      printf ( "Unable to load units A.\n" );
       return false;
     }
   }
   for ( int i = 0; i < 6; i++ )
   {
-    teamB[i] = new unit_t ( size_-i-6, size_-i-6 );
+    teamB[i] = new unit_t ( size_-i-1, size_-i-1 );
     teamB[i]->tile_ = new tile_t ( loadTexture ( gRenderer, "images/unitB.bmp" ) );
     if ( teamB[i]->tile_ == NULL )
     {
-      printf ( "Unable to load units.\n" );
+      printf ( "Unable to load units B.\n" );
       return false;
     }
   }
   return true;
 }
 
-void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
+void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer ) 
 {
   mainReference_->cleanText ( gRenderer );
+  bool visible = false;
   for ( int i = 0; i < size_; i++ )
   {
-    for ( int j = 0; j < size_; j ++ )
+    for ( int j = 0; j < size_; j++ )
     {
-      if ( ( i == cursX_ ) && ( j == cursY_ ) )
-        cursor_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
-      else
+      visible = false;
+      //----Sight check
+      for ( int h = 0; h < 6; h++ )
       {
-        if ( ( i == markX_ ) && ( j == markY_ ) )
-          mark_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+        switch ( current_team )
+        {
+          case 0 :
+            if ( ( abs ( teamA[h]->posX_ - i ) + abs ( teamA[h]->posY_ - j ) ) <= 2 )
+              visible = true;
+            break;
+          case 1 :
+            if ( ( abs ( teamB[h]->posX_ - i ) + abs ( teamB[h]->posY_ - j ) ) <= 2 )
+              visible = true;
+            break;
+          default :
+            break;
+        }
+      }
+      if ( visible )
+      {
+       //----Mouse and map
+        if ( ( i == cursX_ ) && ( j == cursY_ ) )
+          cursor_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
         else
-          regularTile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+        {
+          if ( ( i == markX_ ) && ( j == markY_ ) )
+            mark_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+          else
+            regularTile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+        }
+        //-----Units
+        for ( int k = 0; k < 6; k++ )
+        {
+          if ( ( i == teamA[k]->posX_ ) && ( j == teamA[k]->posY_ ) )
+            if ( teamA[k]->alive_ )
+              teamA[k]->tile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+        }
+        for ( int k = 0; k < 6; k++ )
+        {
+          if ( ( i == teamB[k]->posX_ ) && ( j == teamB[k]->posY_ ) )
+            if ( teamB[k]->alive_ )
+              teamB[k]->tile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+        }
       }
-      for ( int k = 0; k < 6; k++ )
-      {
-        if ( ( i == teamA[k]->posX_ ) && ( j == teamA[k]->posY_ ) )
-          if ( teamA[k]->alive_ )
-            teamA[k]->tile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
-      }
-      for ( int k = 0; k < 6; k++ )
-      {
-        if ( ( i == teamB[k]->posX_ ) && ( j == teamB[k]->posY_ ) )
-          if ( teamB[k]->alive_ )
-            teamB[k]->tile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
-      }
+      else
+        fog_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
     }
   }
   mainReference_->write ( fnt, gRenderer );
 }
 
-void game_instance_t::checkState ( )
+void game_instance_t::checkState ( ) // would be nice to have "turn reference"
 {
   int sumAP = 0;
   if ( current_team == 0 )
@@ -130,9 +162,12 @@ void game_instance_t::checkState ( )
     if ( sumAP == 0 )
     {
       current_team = 1;
+      captured_unit = -1;
+      markX_ = -1;
+      markY_ = -1;
       for ( int i = 0; i < 6; i++ )
         teamB[i]->AP_ = teamB[i]->maxAP_;
-      mainReference_->setText ( "Next move!" );
+      mainReference_->setText ( "Next move B!" );
     }
   }
   if ( current_team == 1 )
@@ -142,14 +177,17 @@ void game_instance_t::checkState ( )
     if ( sumAP == 0 )
     {
       current_team = 0;
+      captured_unit = -1;
+      markX_ = -1;
+      markY_ = -1;
       for ( int i = 0; i < 6; i++ )
         teamA[i]->AP_ = teamA[i]->maxAP_;
-      mainReference_->setText ( "Next move!" );
+      mainReference_->setText ( "Next move A!" );
     }
   }
 }
 
-bool check_Range ( int xa, int ya, int xd, int yd , int wp )
+bool checkRange ( int xa, int ya, int xd, int yd , int wp )
 {
   bool check = true;
   int rng = 0;
@@ -164,125 +202,174 @@ bool check_Range ( int xa, int ya, int xd, int yd , int wp )
   return check;
 }
 
-void game_instance_t::handlePress ( int x, int y )
+int game_instance_t::lookWho( int  tileNumberX, int tileNumberY ) // returns number of current unit, or -1 if none;
 {
-  int tileNumberX = x / pixSize_;
-  int tileNumberY = y / pixSize_;
-  if ( ( tileNumberX <= size_ ) && ( tileNumberY <= size_ ) )
+  int res = -1; 
+  for ( int i = 0; i < 6; i++ )
   {
-    markX_ = tileNumberX;
-    markY_ = tileNumberY;
-    if ( captured_unit != -1 )
+    if ( ( teamA[i]->posX_ == tileNumberX ) && ( teamA[i]->posY_ == tileNumberY ) )
     {
-      bool reserved = false; //collision detect
-      int current_unit = -1;
-      for ( int i = 0; i < 6; i++ )
-      {
-        if ( ( teamA[i]->posX_ == tileNumberX ) && ( teamA[i]->posY_ == tileNumberY ) )
-        {
-          reserved = true;
-          current_unit = i;
-        }
-        if ( ( teamB[i]->posX_ == tileNumberX ) && ( teamB[i]->posY_ == tileNumberY ) )
-        {
-          reserved = true;
-          current_unit = 6 + i;
-        }
-      }
+      res = i;
+      return res;
+    }
+    if ( ( teamB[i]->posX_ == tileNumberX ) && ( teamB[i]->posY_ == tileNumberY ) )
+    {
+      res = i+6;
+      return res;
+    }
+  }
+  return res;
+}
 
-      if ( ! ( reserved ) )
-      {
-        if ( captured_unit < 6 )
-        {
-          int possibleMovement = abs ( tileNumberX - teamA[captured_unit]->posX_ ) + abs ( tileNumberY - teamA[captured_unit]->posY_ );
-          if ( ! ( possibleMovement > teamA[captured_unit]->AP_ ) )
-          {
-            teamA[captured_unit]->posX_ = tileNumberX;
-            teamA[captured_unit]->posY_ = tileNumberY;
-            teamA[captured_unit]->AP_-=possibleMovement;
-          }
-          else
-            mainReference_->setText ( "Not enough action points!" );
+bool game_instance_t::attackUnit ( int current_unit )
+{
+  if ( current_unit < 6 )
+  {
+    if ( teamB[captured_unit%6]->AP_ >= 3 )
+    {
+       bool out_of_range = checkRange ( teamB[captured_unit%6]->posX_, teamB[captured_unit%6]->posY_, teamA[current_unit]->posX_, teamA[current_unit]->posY_, teamB[captured_unit%6]->weapon_ );
+        if ( out_of_range )
+        { 
+          mainReference_->setText ( "Out of range!" );
+          return false;
         }
         else
         {
-          int possibleMovement = abs ( tileNumberX - teamB[captured_unit%6]->posX_ ) + abs ( tileNumberY - teamB[captured_unit%6]->posY_ );
-          if ( ! ( possibleMovement > teamB[captured_unit%6]->AP_ ) )
-          {
-            teamB[captured_unit%6]->posX_ = tileNumberX;
-            teamB[captured_unit%6]->posY_ = tileNumberY;
-            teamB[captured_unit%6]->AP_-=possibleMovement;
-          }
-          else
-            mainReference_->setText ( "Not enough action points!" );
-        }
-      }
-      else
-      {
-        if ( current_unit < 6 )
-        {
-          if ( teamB[captured_unit%6]->AP_ >= 3 )
-          {
-            bool out_of_range = checkRange ( teamB[captured_unit%6]->posX_, teamB[captured_unit%6]->posY_, teamA[current_unit]->posX_, teamA[current_unit]->posY_, teamB[captured_unit%6]->weapon_ );
-            if ( out_of_range )
-              mainReference_->setText ( "Out of range!" );
-            else
-            {
-              teamB[captured_unit%6]->AP_-=3;
-              teamA[current_unit]->HP_--;
-              if ( teamA[current_unit]->HP_ <= 0 )
+          teamB[captured_unit%6]->AP_-=3;
+          teamA[current_unit]->HP_--;
+          if ( teamA[current_unit]->HP_ <= 0 )
                 teamA[current_unit]->kill ( );
-            }
-          }
-          else
-            mainReference_->setText ( "Not enough action points!" );
+          return true;
         }
-        else
-        {
-          if ( teamA[captured_unit]->AP_ >= 3 )
-          {
-            bool out_of_range = checkRange ( teamA[captured_unit]->posX_, teamA[captured_unit]->posY_, teamB[current_unit%6]->posX_, teamB[current_unit%6]->posY_, teamA[captured_unit]->weapon_ );
-            if ( out_of_range )
-              mainReference_->setText ( "Out of range!" );
-            else
-            {
-              teamA[captured_unit]->AP_-=3;
-              teamB[current_unit%6]->HP_--;
-              if ( teamB[current_unit%6]->HP_ <= 0 )
+     }
+     else
+     {
+       mainReference_->setText ( "Not enough action points!" );
+       return false;
+     }
+   }
+   else
+   {
+     if ( teamA[captured_unit]->AP_ >= 3 )
+     {
+       bool out_of_range = checkRange ( teamA[captured_unit]->posX_, teamA[captured_unit]->posY_, teamB[current_unit%6]->posX_, teamB[current_unit%6]->posY_, teamA[captured_unit]->weapon_ );
+       if ( out_of_range )
+       { 
+         mainReference_->setText ( "Out of range!" );
+         return false;
+       }
+       else
+       {
+         teamA[captured_unit]->AP_-=3;
+         teamB[current_unit%6]->HP_--;
+         if ( teamB[current_unit%6]->HP_ <= 0 )
                 teamB[current_unit%6]->kill ( );
-            }
-          }
-          else
-            mainReference_->setText ( "Not enough action points!" );
-        }
-      }
-      markX_ = -1;
-      markY_ = -1;
-      captured_unit = -1;
+         return true;
+       }
+     }  
+     else
+     {
+       mainReference_->setText ( "Not enough action points!" );
+       return false;
+     }
+  }
+}
+
+bool game_instance_t::moveUnit ( int tileNumberX, int tileNumberY )
+{
+  if ( captured_unit < 6 ) //team 0
+  {
+    int possibleMovement = abs ( tileNumberX - teamA[captured_unit]->posX_ ) + abs ( tileNumberY - teamA[captured_unit]->posY_ );
+    if ( possibleMovement <= teamA[captured_unit]->AP_ )
+    {
+      teamA[captured_unit]->posX_ = tileNumberX;
+      teamA[captured_unit]->posY_ = tileNumberY;
+      teamA[captured_unit]->AP_-=possibleMovement;
+      return true;
     }
     else
     {
-      for ( int i = 0; i < 6; i++ )
-      {
-        if ( ( tileNumberX == teamA[i]->posX_ ) && ( tileNumberY == teamA[i]->posY_ ) )
-        {
-          if ( current_team == 0 )
-            captured_unit = i;
-          else
-            mainReference_->setText ( "Enemy" );
-        }
-        else
-          if ( ( tileNumberX == teamB[i]->posX_ ) && ( tileNumberY == teamB[i]->posY_ ) )
-          {
-            if ( current_team == 1 )
-              captured_unit = i + 6;
-            else
-              mainReference_->setText ( "Enemy" );
-          }
-      }
+      mainReference_->setText ( "Not enough action points!" );
+      return false;
     }
-
   }
+  else //team 1
+  {
+    int possibleMovement = abs ( tileNumberX - teamB[captured_unit%6]->posX_ ) + abs ( tileNumberY - teamB[captured_unit%6]->posY_ );
+    if  ( possibleMovement <=teamB[captured_unit%6]->AP_ ) 
+    {
+      teamB[captured_unit%6]->posX_ = tileNumberX;
+      teamB[captured_unit%6]->posY_ = tileNumberY;
+      teamB[captured_unit%6]->AP_-=possibleMovement;
+      return true;
+    }
+    else
+    {
+      mainReference_->setText ( "Not enough action points!" );
+      return false;
+    }
+  }
+}
+
+bool game_instance_t::handlePress ( int x, int y )
+{
+  int tileNumberX = x / pixSize_;
+  int tileNumberY = y / pixSize_;
+  int current_unit = -1;
+  if ( ( tileNumberX > size_ ) && ( tileNumberY > size_ ) )
+  {
+    return false;
+  }
+  current_unit = lookWho( tileNumberX, tileNumberY );
+  if ( ( current_unit >= current_team*6 ) && ( current_unit < ( current_team + 1 )*6 ) ) 
+  {
+    if ( current_unit == captured_unit )
+    {
+      markX_ = -1;
+      markY_ = -1;
+      captured_unit = -1; 
+      return true;
+    }
+    else
+    {
+      markX_ = tileNumberX;
+      markY_ = tileNumberY;
+      captured_unit = current_unit; 
+      return true;
+    }
+  }
+  if ( captured_unit != -1 ) 
+  {
+    if ( ( ( current_unit < current_team*6 ) || ( current_unit >= ( current_team + 1 )*6 ) )&&( current_unit!=-1 ) )
+    {
+      if ( attackUnit ( current_unit ) )
+      {
+        markX_ = -1;
+        markY_ = -1;
+        captured_unit = -1; 
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    } 
+    else 
+    {
+      if ( moveUnit ( tileNumberX, tileNumberY ) )
+      {
+        markX_ = -1;
+        markY_ = -1;
+        captured_unit = -1; 
+        return true;
+      }
+      else
+      {
+        return false;
+      } 
+    }
+  }
+  return false;
 }
 
 void game_instance_t::handleMotion ( int x, int y )
@@ -295,21 +382,21 @@ void game_instance_t::handleMotion ( int x, int y )
     cursY_ = tileNumberY;
     if ( captured_unit != -1 )
     {
-      mainReference_->setText ( "Move" );
-/*
-      for ( int i = 0; i < 6; i++ )
+      int current_unit = lookWho( tileNumberX, tileNumberY );
+      if ( ( current_unit >= current_team*6 ) && ( current_unit < ( current_team + 1 )*6 ) ) 
       {
-        if ( ( tileNumberX == teamA[i]->posX_ ) && ( tileNumberY == teamA[i]->posY_ ) )
-          mainReference_->setText ( "Cannot move here" );
+        if ( current_unit == captured_unit )         
+          mainReference_->setText ( "You are here" );
         else
-        {
-          if ( ( tileNumberX == teamB[i]->posX_ ) && ( tileNumberY == teamB[i]->posY_ ) )
-            mainReference_->setText ( "Attack" );
-          else
-            mainReference_->setText ( "Move" );
-        }
+         mainReference_->setText ( "Cannot move here" );
       }
-*/
+      else
+      {
+        if ( current_unit == -1 )
+          mainReference_->setText ( "Move" );
+        else 
+          mainReference_->setText ( "Attack" );
+      }
     }
   }
 }

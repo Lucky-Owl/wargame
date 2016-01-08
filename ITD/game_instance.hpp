@@ -19,6 +19,7 @@ class game_instance_t
     int current_team;
 
     tile_t * regularTile_; //main tile
+    tile_t * fog_;
 
     tile_t * mark_;
     int markX_;
@@ -38,13 +39,16 @@ class game_instance_t
     bool loadUnits ( SDL_Renderer * gRenderer );
     void drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer );
     void checkState ( );
-    void handlePress ( int x, int y );
+    int lookWho ( int  tileNumberX, int tileNumberY );
+    bool attackUnit ( int current_unit );
+    bool moveUnit ( int tileNumberX, int tileNumberY );
+    bool handlePress ( int x, int y );
     void handleMotion ( int x, int y );
     ~game_instance_t ( );
 
 };
 
 SDL_Texture * loadTexture ( SDL_Renderer * gRenderer, std::string path );
-bool check_Range ( int xa, int ya, int xd, int yd , int wp );
+bool checkRange ( int xa, int ya, int xd, int yd , int wp );
 
 #endif
