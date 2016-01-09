@@ -2,6 +2,7 @@
 
 unit_t::unit_t ( int posX, int posY )
 {
+  teamMarker_ = 0;
   alive_ = true;
   HP_ = 3;
   maxAP_ = 6;
@@ -9,6 +10,16 @@ unit_t::unit_t ( int posX, int posY )
   weapon_ = 1;
   posX_ = posX;
   posY_ = posY;
+}
+
+void unit_t::setMarker ( int x )
+{
+  teamMarker_ = x;
+}
+
+std::string unit_t::information ( )
+{
+  return "It's a fucking unit, what do you want?";
 }
 
 void unit_t::kill ( )

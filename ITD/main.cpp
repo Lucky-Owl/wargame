@@ -121,7 +121,9 @@ int main ( int argc, char* args[] )
 
     Uint32 gID = SDL_GetWindowID ( gWindow );
 
-   while ( !quit )
+    Game->init ( );
+
+    while ( !quit )
     {
       while ( SDL_PollEvent ( &event1 ) != 0 )
       {

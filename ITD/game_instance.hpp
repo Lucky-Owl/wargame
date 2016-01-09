@@ -5,6 +5,10 @@
 #include "reference.hpp"
 #include "tile.hpp"
 #include "unit.hpp"
+#include "team.hpp"
+#include "game_features.hpp"
+#include "command.hpp"
+
 
 class game_instance_t
 {
@@ -14,34 +18,24 @@ class game_instance_t
     int size_;
     int pixSize_;
 
-    int captured_unit;
+    game_features_t * features_;
 
-    int current_team;
+    command_t * currentCommand_;
 
-    tile_t * regularTile_; //main tile
+    tile_t * regularTile_; //main tiles
     tile_t * fog_;
-
-    tile_t * mark_;
-    int markX_;
-    int markY_;
 
     tile_t * cursor_; //cursor
     int cursX_;
     int cursY_;
 
-    unit_t * teamA[6];
-    unit_t * teamB[6];
-
-    reference_t * mainReference_;
  
     game_instance_t ( reference_t * reference, int size, int pixSize );
+    void init ( );
     bool loadImages ( SDL_Renderer * gRenderer );
     bool loadUnits ( SDL_Renderer * gRenderer );
     void drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer );
     void checkState ( );
-    int lookWho ( int  tileNumberX, int tileNumberY );
-    bool attackUnit ( int current_unit );
-    bool moveUnit ( int tileNumberX, int tileNumberY );
     bool handlePress ( int x, int y );
     void handleMotion ( int x, int y );
     ~game_instance_t ( );
@@ -49,6 +43,5 @@ class game_instance_t
 };
 
 SDL_Texture * loadTexture ( SDL_Renderer * gRenderer, std::string path );
-bool checkRange ( int xa, int ya, int xd, int yd , int wp );
 
 #endif
