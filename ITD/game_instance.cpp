@@ -143,7 +143,6 @@ bool game_instance_t::handlePress ( int x, int y )
   {
     return false;
   }
-
   if ( features_->currentUnit_ == NULL )
   {
     currentCommand_ = new chooseCommand_t ( tileNumberX, tileNumberY );
