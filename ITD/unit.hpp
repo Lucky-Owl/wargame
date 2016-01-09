@@ -9,6 +9,8 @@ class unit_t
   public :
     tile_t * tile_;
 
+    int teamMarker_;
+
     int HP_;
     int maxAP_;
     int AP_;
@@ -20,6 +22,8 @@ class unit_t
     bool alive_;
 
     unit_t ( int posX, int posY );
+    void setMarker ( int x );
+    std::string information ( );
     void kill ( );
     ~unit_t ();
 };
