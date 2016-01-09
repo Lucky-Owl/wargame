@@ -2,9 +2,7 @@
 
 void command_t::setGame ( game_features_t * game )
 {
-  printf ( "Method entered\n" );
   game_ = game;
-  printf ( "Method executed\n" );
 }
 
 informationCommand_t::informationCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
@@ -56,6 +54,10 @@ void moveCommand_t::execute ( )
   }
   else
     game_->mainReference_->setText ( "Do you want to die in this dark world?" );
+  game_->markX_ = -1;
+  game_->markY_ = -1;
+  game_->currentUnit_ = NULL;
+  printf ( "moved\n" );
 }
 
 attackCommand_t::attackCommand_t ( unit_t * unit ) : unit_ ( unit ) {}
@@ -121,4 +123,7 @@ void attackCommand_t::execute ( )
   }
   else
     game_->mainReference_->setText ( "Do you want to die in this dark world?" );
+  game_->markX_ = -1;
+  game_->markY_ = -1;
+  game_->currentUnit_ = NULL;
 }
