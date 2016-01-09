@@ -2,7 +2,9 @@
 
 void command_t::setGame ( game_features_t * game )
 {
+  printf ( "Method entered\n" );
   game_ = game;
+  printf ( "Method executed\n" );
 }
 
 informationCommand_t::informationCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
@@ -39,7 +41,6 @@ void chooseCommand_t::execute ( )
 }
 
 moveCommand_t::moveCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
-
 void moveCommand_t::execute ( )
 {
   if ( game_->currentTeam_->connected ( x_, y_, game_->currentUnit_ ) )

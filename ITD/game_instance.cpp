@@ -107,10 +107,11 @@ void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
 
 void game_instance_t::checkState ( ) // would be nice to have "turn reference"
 {
-
-  currentCommand_->setGame ( features_ );
-  currentCommand_->execute ( );
-
+  if ( currentCommand_ != NULL )
+  {
+    currentCommand_->setGame ( features_ );
+    currentCommand_->execute ( );
+  }
 
   int sumAP = 0;
   for ( int i = 0; i < features_->currentTeam_->size_; i++ )
