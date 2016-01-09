@@ -41,19 +41,20 @@ void chooseCommand_t::execute ( )
 moveCommand_t::moveCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
 void moveCommand_t::execute ( )
 {
-  if ( game_->currentTeam_->connected ( x_, y_, game_->currentUnit_ ) )
+  if ( !( game_->currentTeam_->connected ( x_, y_, game_->currentUnit_ ) ) || !( game_->currentTeam_->visible ( x_, y_ ) ) )
+    game_->mainReference_->setText ( "Do you want to die in this dark world?" );
+  else
   {
     if ( ( abs ( game_->currentUnit_->posX_ - x_ ) + abs ( game_->currentUnit_->posY_ - y_ ) ) > game_->currentUnit_->AP_ )
       game_->mainReference_->setText ( "Not enough action points." );
     else
     {
+      game_->currentUnit_->AP_ = game_->currentUnit_->AP_ - abs ( game_->currentUnit_->posX_ - x_ ) - abs ( game_->currentUnit_->posY_ - y_ );
       game_->currentUnit_->posX_ = x_;
       game_->currentUnit_->posY_ = y_;
-      game_->currentUnit_->AP_ -= abs ( game_->currentUnit_->posX_ - x_ ) + abs ( game_->currentUnit_->posY_ - y_ );
     }
   }
-  else
-    game_->mainReference_->setText ( "Do you want to die in this dark world?" );
+  printf ( "AP: %d\n", game_->currentUnit_->AP_ );
   game_->markX_ = -1;
   game_->markY_ = -1;
   game_->currentUnit_ = NULL;

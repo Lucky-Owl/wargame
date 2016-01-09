@@ -37,6 +37,7 @@ bool team_t::connected ( int x, int y, unit_t * exp )
       return false;
     }
   }
+  return true;
 }
 
 void team_t::DFS ( int x, int * stack )
