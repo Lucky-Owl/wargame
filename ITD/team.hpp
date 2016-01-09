@@ -13,6 +13,9 @@ class team_t
 
     team_t ( int size );
     void setMarker ( int x );
+    bool connected ( int x, int y, unit_t * exp );
+    void DFS ( int x, int * stack );
+    bool visible ( int x, int y );
     ~team_t ( );
 };
 

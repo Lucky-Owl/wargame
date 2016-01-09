@@ -60,18 +60,12 @@ bool game_instance_t::loadUnits ( SDL_Renderer * gRenderer )
 void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer ) 
 {
   features_->mainReference_->cleanText ( gRenderer );
-  bool visible = false;
   for ( int i = 0; i < size_; i++ )
   {
     for ( int j = 0; j < size_; j++ )
     {
 //====Sight check======================
-      visible = false;
-      for ( int h = 0; h < features_->currentTeam_->size_; h++ )
-      {
-        if ( ( abs ( features_->currentTeam_->crew_[h]->posX_ - i ) + abs ( features_->currentTeam_->crew_[h]->posY_ - j ) ) <= 5 )
-          visible = true;
-      }
+      bool visible = features_->currentTeam_->visible ( i, j );
 //=====================================
 
       if ( visible )
@@ -113,9 +107,11 @@ void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
 
 void game_instance_t::checkState ( ) // would be nice to have "turn reference"
 {
-  currentCommand_->setGame ( features_ );
-  currentCommand_->execute ( );
-
+  if ( currentCommand_ != NULL )
+  {
+    currentCommand_->setGame ( features_ );
+    currentCommand_->execute ( );
+  }
 
   int sumAP = 0;
   for ( int i = 0; i < features_->currentTeam_->size_; i++ )

@@ -1,7 +1,5 @@
-#export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
-
-program: main.o game_instance.o reference.o tile.o unit.o team.o game_features.o basics.o
-	g++ -o program main.o game_instance.o reference.o tile.o unit.o team.o game_features.o basics.o -lSDL2 -lSDL2_image -lSDL2_ttf -lm
+program: main.o game_instance.o reference.o tile.o unit.o team.o game_features.o basics.o command.o
+	g++ -o program main.o game_instance.o reference.o tile.o unit.o team.o game_features.o basics.o command.o -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 
 main.o : main.cpp
 	g++ -c main.cpp
@@ -26,6 +24,9 @@ game_features.o : game_features.cpp
 
 basics.o : basics.cpp
 	g++ -c basics.cpp
+
+command.o : command.cpp
+	g++ -c command.cpp
 
 clean:
 	rm -f *.o program

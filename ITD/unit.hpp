@@ -14,6 +14,7 @@ class unit_t
     int HP_;
     int maxAP_;
     int AP_;
+    int sight_;
 
     int weapon_; // 0 - sword, 1 - shotgun, 2 - rifle, 3 - sniper rifle
 
@@ -23,6 +24,7 @@ class unit_t
 
     unit_t ( int posX, int posY );
     void setMarker ( int x );
+    bool visible ( int x, int y );
     std::string information ( );
     void kill ( );
     ~unit_t ();
