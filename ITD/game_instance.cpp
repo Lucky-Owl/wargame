@@ -107,10 +107,24 @@ void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
 
 void game_instance_t::checkState ( ) // would be nice to have "turn reference"
 {
+  printf ( "checkState entered\n" );
   if ( currentCommand_ != NULL )
   {
     currentCommand_->setGame ( features_ );
     currentCommand_->execute ( );
+    currentCommand_ = NULL;
+  }
+
+  for ( int i = 0; i < features_->teamA_->size_; i++ )
+  {
+    if ( features_->teamA_->crew_[i]->HP_ <= 0 )
+      features_->teamA_->crew_[i] -> kill ( );
+  }
+
+  for ( int i = 0; i < features_->teamB_->size_; i++ )
+  {
+    if ( features_->teamB_->crew_[i]->HP_ <= 0 )
+      features_->teamB_->crew_[i] -> kill ( );
   }
 
   int sumAP = 0;
@@ -167,9 +181,12 @@ void game_instance_t::handleMotion ( int x, int y )
   int tileNumberY = y / pixSize_;
   if ( ( tileNumberX <= size_ ) && ( tileNumberY <= size_ ) )
   {
-    cursX_ = tileNumberX;
-    cursY_ = tileNumberY;
-    currentCommand_ = new informationCommand_t ( cursX_, cursY_ );
+    if ( ( tileNumberX != cursX_ ) || ( tileNumberY != cursY_ ) )
+    {
+      cursX_ = tileNumberX;
+      cursY_ = tileNumberY;
+      currentCommand_ = new informationCommand_t ( cursX_, cursY_ );
+    }
   }
 }
 
