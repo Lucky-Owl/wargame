@@ -1,5 +1,7 @@
+#export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib"
+
 program: main.o game_instance.o reference.o tile.o unit.o
-	g++ -o program main.o game_instance.o reference.o tile.o unit.o -lSDL2 -lSDL2_image -lSDL2_ttf -lm
+	g++ -o program main.o game_instance.o reference.o tile.o unit.o -lSDL2 -lSDL2_image -lSDL2_ttf 
 
 main.o : main.cpp
 	g++ -c main.cpp
