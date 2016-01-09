@@ -20,3 +20,8 @@ SDL_Texture * loadTexture ( SDL_Renderer * gRenderer, std::string path )
   }
   return newTexture;
 }
+
+bool inSquare ( int x, int y, int xVer, int yVer, int w )
+{
+  return ( ( x >= xVer ) && ( x <= xVer + w ) && ( y >=yVer ) && ( y <= yVer + w ) );
+}

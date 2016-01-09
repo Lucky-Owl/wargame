@@ -13,10 +13,7 @@ class command_t
   public:
     virtual void execute ( ) = 0;
 
-    void setGame ( game_features_t * game )
-    {
-      game_ = game;
-    }
+    void setGame ( game_features_t * game );
 };
 
 class informationCommand_t : public command_t
@@ -25,14 +22,9 @@ class informationCommand_t : public command_t
     int x_;
     int y_;
   public:
-    informationCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
-    void execute ( )
-    {
-      if ( (game_->lookUpUnit ( x_, y_ )) == NULL )
-        game_->mainReference_->setText ( "It's just a ground." );
-      else
-        game_->mainReference_->setText ( game_->lookUpUnit ( x_, y_ ) -> information ( ) );
-    }
+    informationCommand_t ( int x, int y );
+   // ~informationCommand_t ( ) {}
+    void execute ( );
 };
 
 class chooseCommand_t : public command_t
@@ -41,19 +33,9 @@ class chooseCommand_t : public command_t
     int x_;
     int y_;
   public:
-    chooseCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
-    void execute ( )
-    {
-      game_->markX_ = x_;
-      game_->markY_ = y_;
-      if ( game_->lookUpUnit ( x_, y_ ) != NULL )
-      {
-        if ( game_->lookUpUnit ( x_, y_ )->teamMarker_ == game_->currentTeam_->teamMarker_ )
-        {
-          game_->currentUnit_ = game_->lookUpUnit ( x_, y_ );
-        }
-      }
-    }
+    chooseCommand_t ( int x, int y );
+ //   ~chooseCommand_t ( ) {}
+    void execute ( );
 };
 
 class moveCommand_t : public command_t
@@ -62,11 +44,9 @@ class moveCommand_t : public command_t
     int x_;
     int y_;
   public:
-    moveCommand_t ( int x, int y ) : x_ ( x ), y_ ( y ) {}
-    void execute ( )
-    {
-
-    }
+    moveCommand_t ( int x, int y );
+  //  ~moveCommand_t ( ) {}
+    void execute ( );
 };
 
 class  attackCommand_t : public command_t
@@ -74,11 +54,9 @@ class  attackCommand_t : public command_t
   private:
     unit_t * unit_;
   public:
-    attackCommand_t ( unit_t * unit ) : unit_ ( unit ) {}
-    void execute ( )
-    {
-
-    }
+    attackCommand_t ( unit_t * unit );
+    ~attackCommand_t ( ) {}
+    void execute ( );
 };
 
 #endif

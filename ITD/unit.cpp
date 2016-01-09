@@ -7,6 +7,7 @@ unit_t::unit_t ( int posX, int posY )
   HP_ = 3;
   maxAP_ = 6;
   AP_ = 6;
+  sight_ = 4;
   weapon_ = 1;
   posX_ = posX;
   posY_ = posY;
@@ -15,6 +16,13 @@ unit_t::unit_t ( int posX, int posY )
 void unit_t::setMarker ( int x )
 {
   teamMarker_ = x;
+}
+
+bool unit_t::visible ( int x, int y )
+{
+  if ( ( abs ( posX_ - x ) + abs ( posY_ - y ) ) > sight_ )
+    return false;
+  return true;
 }
 
 std::string unit_t::information ( )
