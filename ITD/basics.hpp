@@ -12,5 +12,6 @@
 
 SDL_Texture * loadTexture ( SDL_Renderer * gRenderer, std::string path );
 bool inSquare ( int x, int y, int xVer, int yVer, int w );
+bool checkRange ( int xD, int yD, int xA, int yA, int w );
 
 #endif

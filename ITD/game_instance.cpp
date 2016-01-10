@@ -49,6 +49,12 @@ bool game_instance_t::loadImages ( SDL_Renderer * gRenderer )
     printf("Failed loading tile texture!\n");
     success = false;
   }
+  tileAttack_ = new tile_t ( loadTexture ( gRenderer, "images/tileAttack.bmp" ) );
+  if ( tileAttack_ == NULL ) 
+  {
+    printf("Failed loading tile texture!\n");
+    success = false;
+  }
   fog_ = new tile_t ( loadTexture ( gRenderer, "images/fog.bmp" ) );
   if ( fog_ == NULL ) 
   {
@@ -86,8 +92,26 @@ void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
             features_->mark_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
           else
           {
-            if ( ( features_->currentUnit_ != NULL ) && ( features_->currentTeam_->connected ( i, j, features_->currentUnit_ ) ) && ( features_->currentUnit_->reachable ( i, j ) ) )
-              tileMove_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+            if ( features_->currentUnit_ != NULL )
+            {
+              if ( features_->lookUpUnit ( i, j ) == NULL )
+              {
+                if ( ( features_->currentTeam_->connected ( i, j, features_->currentUnit_ ) ) && ( features_->currentUnit_->reachable ( i, j ) ) )
+                  tileMove_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+                else
+                  tileSight_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+              }
+              else
+              {
+                if ( features_->lookUpUnit ( i, j )->teamMarker_ == features_->currentUnit_->teamMarker_ )
+                  tileSight_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+                else
+                {
+                  if ( checkRange ( features_->lookUpUnit ( i, j )->posX_, features_->lookUpUnit ( i, j )->posY_, features_->currentUnit_->posX_, features_->currentUnit_->posY_, features_->currentUnit_->weapon_ ) )
+                    tileAttack_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+                }
+              }
+            }
             else
               tileSight_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
           }
@@ -206,6 +230,7 @@ game_instance_t::~game_instance_t()
   delete currentCommand_;
   delete tileSight_;
   delete tileMove_;
+  delete tileAttack_;
   delete cursor_;
   delete fog_;
   delete features_;

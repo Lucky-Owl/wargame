@@ -75,54 +75,13 @@ void attackCommand_t::execute ( )
         game_->mainReference_->setText ( "Not enough action points." );
       else
       {
-        switch ( game_->currentUnit_->weapon_ )
+        if ( checkRange ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_, game_->currentUnit_->posY_, game_->currentUnit_->weapon_ ) )
         {
-          case 0:
-            if ( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-1, game_->currentUnit_->posY_-1, 3 ) )
-            {
-              unit_->HP_-=1;
-              game_->currentUnit_->AP_-=3;
-              game_->mainReference_->setText ( "Good sword attack." );
-            }
-            else
-              game_->mainReference_->setText ( "Not in range." );
-            break;
-          case 1:
-            if ( ( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-3, game_->currentUnit_->posY_-3, 7 ) ) &&
-               !( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-1, game_->currentUnit_->posY_-1, 3 ) ) )
-            {
-              unit_->HP_-=1;
-              game_->currentUnit_->AP_-=3;
-              game_->mainReference_->setText ( "Good shotgun attack." );
-            }
-            else
-              game_->mainReference_->setText ( "Not in range." );
-            break;
-          case 2:
-            if ( ( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-5, game_->currentUnit_->posY_-5, 11 ) ) &&
-               !( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-3, game_->currentUnit_->posY_-3, 7 ) ) )
-            {
-              unit_->HP_-=1;
-              game_->currentUnit_->AP_-=3;
-              game_->mainReference_->setText ( "Good riffle attack." );
-            }
-            else
-              game_->mainReference_->setText ( "Not in range." );
-            break;
-          case 3:
-            if ( !( inSquare ( unit_->posX_, unit_->posY_, game_->currentUnit_->posX_-5, game_->currentUnit_->posY_-5, 11 ) ) )
-            {
-              unit_->HP_-=1;
-              game_->currentUnit_->AP_-=3;
-              game_->mainReference_->setText ( "Good sniper riffle attack." );
-            }
-            else
-              game_->mainReference_->setText ( "Not in range." );
-            break;
-          default:
-            printf ( "Unknown type of weapon.\n" );
-            break;
+          unit_->HP_-=1;
+          game_->currentUnit_->AP_-=3;
         }
+        else
+          game_->mainReference_->setText ( "Not in range." );
       }
     }
   }

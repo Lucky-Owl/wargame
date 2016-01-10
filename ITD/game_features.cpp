@@ -26,7 +26,7 @@ bool game_features_t::loadFeatures ( SDL_Renderer * gRenderer, int mapSize )
   teamB_->setMarker ( 1 );
   for ( int i = 0; i < teamB_->size_; i++ )
   {
-    teamB_->crew_[i] = new unit_t ( mapSize-i-1, mapSize-i-1 );
+    teamB_->crew_[i] = new unit_t ( mapSize-i-16, mapSize-i-16 );
     teamB_->crew_[i]->setMarker ( teamB_->teamMarker_ );
     teamB_->crew_[i]->tile_ = new tile_t ( loadTexture ( gRenderer, "images/unitB.bmp" ) );
     if ( teamB_->crew_[i]->tile_ == NULL )
