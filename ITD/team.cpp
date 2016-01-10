@@ -17,21 +17,20 @@ bool team_t::connected ( int x, int y, unit_t * exp )
   int oldY = exp->posY_;
   exp->posX_ = x;
   exp->posY_ = y;
+
   int stack[size_];
   for ( int i = 0; i < size_; i++ )
     stack[i] = 0;
 
-  for ( int i = 0; i < size_; i++ )
-  {
-    if ( stack[i] == 0 )
-      DFS ( i, stack );
-  }
+  if ( stack[0] == 0 )
+    DFS ( 0, stack );
 
   exp->posX_ = oldX;
   exp->posY_ = oldY;
 
   for ( int i = 0; i < size_; i++ )
   {
+    printf ( "%d\n", stack[i] );
     if ( stack[i] == 0 )
     {
       return false;
@@ -42,6 +41,7 @@ bool team_t::connected ( int x, int y, unit_t * exp )
 
 void team_t::DFS ( int x, int * stack )
 {
+  printf ( "DFS\n" );
   stack[x] = 1;
   for ( int i = 0; i < size_; i ++ )
   {
