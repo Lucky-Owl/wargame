@@ -25,6 +25,13 @@ bool unit_t::visible ( int x, int y )
   return true;
 }
 
+bool unit_t::reachable ( int x, int y )
+{
+  if ( ( abs ( posX_ - x ) + abs ( posY_ - y ) ) > AP_ )
+    return false;
+  return true;
+}
+
 std::string unit_t::information ( )
 {
   return "It's a fucking unit, what do you want?";

@@ -37,8 +37,14 @@ bool game_instance_t::loadImages ( SDL_Renderer * gRenderer )
     printf("Failed loading mark texture!\n");
     success = false;
   }
-  regularTile_ = new tile_t ( loadTexture ( gRenderer, "images/tile.bmp" ) );
-  if ( regularTile_ == NULL ) 
+  tileMove_ = new tile_t ( loadTexture ( gRenderer, "images/tileMove.bmp" ) );
+  if ( tileMove_ == NULL ) 
+  {
+    printf("Failed loading tile texture!\n");
+    success = false;
+  }
+  tileSight_ = new tile_t ( loadTexture ( gRenderer, "images/tileSight.bmp" ) );
+  if ( tileSight_ == NULL ) 
   {
     printf("Failed loading tile texture!\n");
     success = false;
@@ -79,7 +85,12 @@ void game_instance_t::drawContent ( TTF_Font * fnt, SDL_Renderer * gRenderer )
           if ( ( i == features_->markX_ ) && ( j == features_->markY_ ) )
             features_->mark_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
           else
-            regularTile_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+          {
+            if ( ( features_->currentUnit_ != NULL ) && ( features_->currentTeam_->connected ( i, j, features_->currentUnit_ ) ) && ( features_->currentUnit_->reachable ( i, j ) ) )
+              tileMove_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+            else
+              tileSight_->draw ( gRenderer, i*pixSize_, j*pixSize_, pixSize_ );
+          }
         }
 //=====================================
 
@@ -193,7 +204,8 @@ void game_instance_t::handleMotion ( int x, int y )
 game_instance_t::~game_instance_t()
 {
   delete currentCommand_;
-  delete regularTile_;
+  delete tileSight_;
+  delete tileMove_;
   delete cursor_;
   delete fog_;
   delete features_;

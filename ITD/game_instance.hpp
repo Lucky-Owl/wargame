@@ -22,8 +22,9 @@ class game_instance_t
 
     command_t * currentCommand_;
 
-    tile_t * regularTile_; //main tiles
+    tile_t * tileSight_; //main tiles
     tile_t * fog_;
+    tile_t * tileMove_;
 
     tile_t * cursor_; //cursor
     int cursX_;

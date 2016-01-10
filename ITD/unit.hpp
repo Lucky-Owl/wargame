@@ -25,6 +25,7 @@ class unit_t
     unit_t ( int posX, int posY );
     void setMarker ( int x );
     bool visible ( int x, int y );
+    bool reachable ( int x, int y );
     std::string information ( );
     void kill ( );
     ~unit_t ();

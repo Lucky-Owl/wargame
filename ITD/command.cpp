@@ -45,7 +45,7 @@ void moveCommand_t::execute ( )
     game_->mainReference_->setText ( "Do you want to die in this dark world?" );
   else
   {
-    if ( ( abs ( game_->currentUnit_->posX_ - x_ ) + abs ( game_->currentUnit_->posY_ - y_ ) ) > game_->currentUnit_->AP_ )
+    if ( !(game_->currentUnit_->reachable ( x_, y_ ) ) )
       game_->mainReference_->setText ( "Not enough action points." );
     else
     {
